@@ -1,11 +1,5 @@
-from os import wait3
-from symbol import continue_stmt
 
 import pygame
-
-from src.main import ladders
-
-
 # Player class
 class Player:
     def __init__(self):

@@ -12,7 +12,7 @@ platforms = []
 ladders = []
 player = Player()
 def start():
-    
+    ladders.clear()
     platforms.append(Platform(0 , 720, 13))
     for i in range (3):
         platforms.append(Platform(100, 620 - 200 * i, 11))
@@ -32,9 +32,8 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
             # Reset the level
-            start()
-            ladders.clear()
 
+            start()
     screen.fill((80, 155, 250))
     keys = pygame.key.get_pressed()
     player.update(screen, keys , platforms)
