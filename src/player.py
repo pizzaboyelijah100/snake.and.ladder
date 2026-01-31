@@ -1,5 +1,5 @@
-
 import pygame
+import level
 # Player class
 class Player:
     def __init__(self):
@@ -33,7 +33,8 @@ class Player:
     def set_animation (self, name):
         self.current_animation = self.animations[name]
 
-    def update(self, screen, keys , platforms):
+    def update(self, screen, keys , platforms , ladders , snakes ,):
+
 
 
         if not self.alive:
@@ -42,7 +43,11 @@ class Player:
         else:
 
             if self.climbing:
-                pass
+                if keys[pygame.K_UP]:
+
+                    self.rect.y -= self.move_speed
+                if keys[pygame.K_DOWN]:
+                    self.rect.y += self.move_speed
             else:
                 if keys[pygame.K_LEFT]:
                     self.rect.x -= self.move_speed
@@ -55,7 +60,8 @@ class Player:
                 if keys[pygame.K_SPACE] and self.grounded :
                     self.y_speed = -self.jump_power
                     self.grounded = False
-
+                if keys[pygame.K_DOWN] and not self.grounded:
+                    self.rect.y += 5
 
                 if self.rect.x < 0 :
                     self.rect.x = 0
@@ -74,6 +80,17 @@ class Player:
                     self.grounded = True
             else:
                 self.grounded = False
+            for ladder in ladders:
+                if self.rect.colliderect(ladder.climb_rect):
+                    if (keys[pygame.K_UP] and self.rect.bottom > ladder.climb_rect.bottom
+                            or keys[pygame.K_DOWN] and self.rect.top < ladder.climb_rect.top):
+                        self.climbing = True
+                        self.y_speed = 0
+                        self.rect.centerx = ladder.rect.centerx
+                        self.set_animation("climb")
+                    elif keys[pygame.K_UP] and self.rect.centery < ladder.climb_rect.top or \
+                            keys[pygame.K_DOWN] and self.rect.bottom > ladder.climb_rect.bottom:
+                            self.climbing = False
 
             self.rect.move_ip(0, self.y_speed)
         if self.animation_timer <= 0:
@@ -97,4 +114,6 @@ class Player:
         self.climbing = False
         self.alive = True
         self.has_won = False
-
+    def bop(self):
+        if not self.climbing:
+            self.y_speed = -self.jump_power / 2
