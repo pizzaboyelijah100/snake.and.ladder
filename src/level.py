@@ -65,3 +65,7 @@ class Snake:
                     self.animation_frame = 0
 
         screen.blit(self.images[self.animation_frame], self.rect)
+    def bop(self):
+        self.alive = False
+        self.images[0] = pygame.transform.flip(self.images[0], False, True)
+        self.images[1] = pygame.transform.flip(self.images[1], False, True)

@@ -16,6 +16,12 @@ snaketimermax = 100
 snaketimer = snaketimermax
 maxsnakes = 8
 spawnchance = 40
+font = pygame.font.Font(None , 40)
+level = 1
+nextleveltext = font.render('press z key to go the next level' , True , (0 , 0 , 0))
+restarttext = font.render('press r to restart' , True , (0 , 0 , 0))
+gameovertext = font.render('gameover press r to restart' , True , (0 , 0 , 0))
+
 def spawn_snakes():
     for i in range(1, 6):
         # controlls the spawn chance
@@ -60,7 +66,6 @@ while running:
     if snaketimer <= 0:
         snaketimer = snaketimermax
         spawn_snakes()
-
     for p in platforms:
         p.update(screen)
     for l in ladders:
@@ -72,7 +77,26 @@ while running:
             snakes.remove(s)
 
 
-    player.update(screen, keys, platforms , ladders , snakes)
+    player.update(screen, keys, platforms , ladders , snakes )
+    if player.grounded and player.rect.colliderect(platforms[-1]):
+        player.win()
+    if player.has_won:
+        screen.blit(nextleveltext , (0, 50))
+        if keys[pygame.K_z]:
+            start()
+            level += 1
 
+    if not player.alive :
+
+        if player.lives <= 0:
+            screen.blit(gameovertext , (50 , 50))
+            if keys[pygame.K_r]:
+                level = 1
+        else:
+            screen.blit(restarttext,(200 , 30))
+    level_text = font.render('Your on level ' + str(level), True, (0, 0, 0))
+    lives_text = font.render('Your lives is ' +str(player.lives), True , (0,0,0))
+    screen.blit(level_text, (450, 0))
+    screen.blit(lives_text , (0, 0))
     pygame.display.flip()
     clock.tick(50)

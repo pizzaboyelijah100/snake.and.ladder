@@ -33,13 +33,16 @@ class Player:
     def set_animation (self, name):
         self.current_animation = self.animations[name]
 
-    def update(self, screen, keys , platforms , ladders , snakes ,):
-
+    def update(self, screen, keys , platforms , ladders , snakes ):
 
 
         if not self.alive:
 
             self.rect.y += self.move_speed
+        elif self.has_won:
+            self.image_to_draw =  self.image_in_air
+
+
         else:
 
             if self.climbing:
@@ -60,7 +63,7 @@ class Player:
                 if keys[pygame.K_SPACE] and self.grounded :
                     self.y_speed = -self.jump_power
                     self.grounded = False
-                if keys[pygame.K_DOWN] and not self.grounded:
+                if keys[pygame.K_DOWN] and not self.grounded and not keys[pygame.K_SPACE]:
                     self.rect.y += 5
 
                 if self.rect.x < 0 :
@@ -91,22 +94,30 @@ class Player:
                     elif keys[pygame.K_UP] and self.rect.centery < ladder.climb_rect.top or \
                             keys[pygame.K_DOWN] and self.rect.bottom > ladder.climb_rect.bottom:
                             self.climbing = False
+            for snake in snakes:
+                if self.alive and self.rect.colliderect(snake.rect):
+                    if self.rect.bottom > snake.rect.centery:
+                        self.alive = False
+                        self.lives -= 1
+                    else:
+                        snake.bop()
+                        self.bop()
 
             self.rect.move_ip(0, self.y_speed)
-        if self.animation_timer <= 0:
-            self.animation_timer = self.animation_timer_max
+            if self.animation_timer <= 0:
+                self.animation_timer = self.animation_timer_max
 
-            if self.animation_frame <= 0:
-                self.animation_frame += 1
+                if self.animation_frame <= 0:
+                    self.animation_frame += 1
 
-            else:
-                self.animation_frame -= 1
+                else:
+                    self.animation_frame -= 1
 
-        image_to_draw = self.current_animation[self.animation_frame]
-        if self.facing_left:
-            image_to_draw = pygame.transform.flip(image_to_draw, True , False)
+            self.image_to_draw = self.current_animation[self.animation_frame]
+            if self.facing_left:
+                self.image_to_draw = pygame.transform.flip(self.image_to_draw, True , False)
 
-        screen.blit(image_to_draw ,self.rect)
+        screen.blit(self.image_to_draw ,self.rect)
 
     def reset(self, x, y):
         self.rect.bottomleft = x, y
@@ -117,3 +128,5 @@ class Player:
     def bop(self):
         if not self.climbing:
             self.y_speed = -self.jump_power / 2
+    def win(self):
+        self.has_won = True
